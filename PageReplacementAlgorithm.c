@@ -14,7 +14,7 @@ void cleanFrame(int *frame, int frameSize);
 void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void secondChance(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
-void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount);
+void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 
 int main()
 {
@@ -66,6 +66,7 @@ int main()
                 leastRecentlyUsed(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
                 break;
             case OPTIMAL:
+                optimalPageReplacement(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
                 break;
             case EXIT:
                 break;
@@ -265,8 +266,85 @@ void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceA
     return ;
 }
 
-void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount)
+void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit)
 {
+    for (int i = 0; i < referenceAmount; i++)
+    {
+        int found = 0;
+        for (int j = 0; j < frameSize; j++)
+        {
+            if (frame[j] == reference[i])
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            pageHit++;
+            printf("Page Hit of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("\n");
+            continue;
+        }
+
+        int longestIndex = i;
+
+		for (int j = 0; j < frameSize; j++)
+		{
+			for (int k = i; k < referenceAmount; k++)
+			{
+			    if (k == referenceAmount - 1)
+				{
+					if (frame[j] == reference[k])
+						longestIndex = k;
+					else
+						longestIndex = referenceAmount;
+				}
+
+				if (frame[j] == reference[k])
+				{
+					if (k > longestIndex)
+						longestIndex = k;
+					break;
+				}
+			}
+
+			if (longestIndex == referenceAmount)
+			{
+				frame[j] = reference[i];
+				break;
+			}
+		}
+
+		if (longestIndex == 12)
+        {
+            pageFault++;
+            printf("Page Fault of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("\n");
+            continue;
+        }
+
+		for (int j = 0; j < frameSize; j++)
+		{
+			if (frame[j] == reference[longestIndex])
+			{
+				frame[j] = reference[i];
+				break;
+			}
+		}
+
+        pageFault++;
+        printf("Page Fault of reference %d!\n", reference[i]);
+        printCurrentFrame(frame, frameSize);
+        printf("\n");
+
+    }
+
+    printf("Amount of page fault: %d\n", pageFault);
+    printf("Amount of page hit: %d\n\n", pageHit);
 
     return ;
 }
