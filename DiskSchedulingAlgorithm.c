@@ -8,6 +8,7 @@ enum algorithm {
     CSCAN,
     LOOK,
     CLOOK,
+    LFU,
     EXIT,
 };
 
@@ -19,6 +20,8 @@ void cScan(int *device, int deviceAmount, int headStart);
 void cScan(int *device, int deviceAmount, int headStart);
 void look(int *device, int deviceAmount, int headStart);
 void cLook(int *device, int deviceAmount, int headStart);
+void initializeLfuFrequencies(int *device, int deviceAmount, int *frequency);
+void lfu(int *device, int deviceAmount, int headStart);
 
 int main()
 {
@@ -60,6 +63,7 @@ int main()
         printf("%d. C-SCAN\n", CSCAN);
         printf("%d. LOOK\n", LOOK);
         printf("%d. C-LOOK\n", CLOOK);
+        printf("%d. LFU\n", LFU);
         printf("%d. Exit\n", EXIT);
         printf("Choice: ");
         scanf(" %d", &choice);
@@ -86,6 +90,9 @@ int main()
                 break;
             case CLOOK:
                 cLook(deviceCopy, deviceAmount, headStart);
+                break;
+            case LFU:
+                lfu(deviceCopy, deviceAmount, headStart);
                 break;
             case EXIT:
                 break;
@@ -587,6 +594,92 @@ void cLook(int *device, int deviceAmount, int headStart)
     }
 
     printf("Final Seek Time = %d\n\n", finalSeekTime);
+
+    return ;
+}
+
+void lfu(int *device, int deviceAmount, int headStart)
+{
+    printDeviceRequest(device, deviceAmount);
+
+    // frequency arr to track how many times each device has been accessed
+    int frequency[200];
+    for (int i = 0; i < 200; i++)
+    {
+        frequency[i] = 0;
+    }
+
+    // Initialize freq
+    initializeLfuFrequencies(device, deviceAmount, frequency);
+
+    int finalSeekTime = 0, step = 1;
+    int used[deviceAmount];
+
+    // Initialize used array
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        used[i] = 0;
+    }
+
+    for (int i = 0; i < deviceAmount; i++, step++)
+    {
+        int leastFrequency = INT_MAX;
+        int leastFrequencyIndex = 0;
+        int shortestDistance = INT_MAX;
+
+        // Find the device with least frequency
+        for (int j = 0; j < deviceAmount; j++)
+        {
+            if (used[j])
+                continue;
+
+            if (frequency[device[j]] < leastFrequency)
+            {
+                leastFrequency = frequency[device[j]];
+                leastFrequencyIndex = j;
+                shortestDistance = abs(headStart - device[j]);
+            }
+            // If frequencies are equal, choose the one with shorter seek time
+            else if (frequency[device[j]] == leastFrequency)
+            {
+                int distance = abs(headStart - device[j]);
+                if (distance < shortestDistance)
+                {
+                    leastFrequencyIndex = j;
+                    shortestDistance = distance;
+                }
+            }
+        }
+
+        int difference = abs(headStart - device[leastFrequencyIndex]);
+        printf("Step %d\n", step);
+        printf("Head = %d\n", headStart);
+        printf("Device = %d (frequency = %d)\n", device[leastFrequencyIndex], frequency[device[leastFrequencyIndex]]);
+        printf("Head to device difference = %d\n\n", difference);
+        
+        finalSeekTime += difference;
+        headStart = device[leastFrequencyIndex];
+        used[leastFrequencyIndex] = 1;
+        
+        // Increment frequency for the accessed device
+        frequency[device[leastFrequencyIndex]]++;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
+
+    return ;
+}
+
+void initializeLfuFrequencies(int *device, int deviceAmount, int *frequency)
+{
+    // init all freq to 0
+    printf("Initial frequencies:\n");
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        frequency[device[i]] = 0; 
+        printf("Device %d: frequency = %d\n", device[i], frequency[device[i]]);
+    }
+    printf("\n");
 
     return ;
 }
