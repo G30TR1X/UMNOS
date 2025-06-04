@@ -1,9 +1,9 @@
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 enum algorithm {
     FCFS = 1,
+    SSTF,
     SCAN,
     CSCAN,
     LOOK,
@@ -43,12 +43,13 @@ int main()
     while (choice != EXIT)
     {
         printf("Pick your Disk Scheduling Algorithm!\n");
-        printf("%d First Come First Serve\n", FCFS);
-        printf("%d SCAN\n", SCAN);
-        printf("%d C-SCAN\n", CSCAN);
-        printf("%d LOOK\n", LOOK);
-        printf("%d C-LOOK\n", CLOOK);
-        printf("%d Exit\n", EXIT);
+        printf("%d. First Come First Serve\n", FCFS);
+        printf("%d. Shortest Seek Time\n", SSTF);
+        printf("%d. SCAN\n", SCAN);
+        printf("%d. C-SCAN\n", CSCAN);
+        printf("%d. LOOK\n", LOOK);
+        printf("%d. C-LOOK\n", CLOOK);
+        printf("%d. Exit\n", EXIT);
         printf("Choice: ");
         scanf(" %d", &choice);
 
@@ -74,7 +75,7 @@ int main()
             case EXIT:
                 break;
             default:
-                printf("Pick a number from %d - %d", FCFS, EXIT);
+                printf("Pick a number from %d - %d\n\n", FCFS, EXIT);
         }
     }
 

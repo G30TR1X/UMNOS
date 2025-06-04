@@ -1,6 +1,5 @@
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 enum algorithm {
     FIFO = 1,
@@ -14,7 +13,7 @@ void copyArray(int *originalArray, int *newArray, int size);
 void cleanFrame(int *frame, int frameSize);
 void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void secondChance(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
-void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount);
+void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount);
 
 int main()
@@ -64,13 +63,14 @@ int main()
                 secondChance(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
                 break;
             case LRU:
+                leastRecentlyUsed(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
                 break;
             case OPTIMAL:
                 break;
             case EXIT:
                 break;
             default:
-                printf("Pick a number from %d - %d", FIFO, EXIT);
+                printf("Pick a number from %d - %d\n\n", FIFO, EXIT);
         }
     }
 
@@ -215,11 +215,56 @@ void secondChance(int *frame, int frameSize, int *reference, int referenceAmount
     return ;
 }
 
-void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount)
+void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit)
 {
+    for (int i = 0; i < referenceAmount; i++)
+    {
+        int found = 0;
+        for (int j = 0; j < frameSize; j++)
+        {
+            if (frame[j] == reference[i])
+            {
+                found = 1;
+
+                for (int k = j; k >= 0; k--)
+                {
+                    if (k == 0)
+                        frame[k] = reference[i];
+                    else
+                        frame[k] = frame[k-1];
+                }
+
+                break;
+            }
+        }
+
+        if (found)
+        {
+            pageHit++;
+            printf("Page Hit of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("\n");
+            continue;
+        }
+
+        for (int j = frameSize - 1; j > 0; j--)
+        {
+            frame[j] = frame[j-1];
+        }
+        frame[0] = reference[i];
+
+        pageFault++;
+        printf("Page Fault of reference %d!\n", reference[i]);
+        printCurrentFrame(frame, frameSize);
+        printf("\n");
+    }
+
+    printf("Amount of page fault: %d\n", pageFault);
+    printf("Amount of page hit: %d\n\n", pageHit);
 
     return ;
 }
+
 void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount)
 {
 
