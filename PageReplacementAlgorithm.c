@@ -12,8 +12,8 @@ enum algorithm {
 
 void copyArray(int *originalArray, int *newArray, int size);
 void cleanFrame(int *frame, int frameSize);
-void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount);
-void secondChance(int *frame, int frameSize, int *reference, int referenceAmount);
+void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
+void secondChance(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount);
 void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount);
 
@@ -32,21 +32,23 @@ int main()
     for (int i = 0; i < referenceAmount; i++)
     {
         printf("Reference %d: ", i+1);
-        scanf(" %d", &frame[i]);
+        scanf(" %d", &referenceInput[i]);
     }
     printf("\n");
 
+    int pageFault = 0;
+    int pageHit = 0;
     int referenceCopy[referenceAmount];
 
     int choice;
     while (choice != EXIT)
     {
         printf("Pick your Replacement Algorithm!\n");
-        printf("%d First In First Out\n", FIFO);
-        printf("%d Second Chance\n", SECONDCHANCE);
-        printf("%d Least Recently Used\n", LRU);
-        printf("%d Optimal Page Replacement\n", OPTIMAL);
-        printf("%d Exit\n", EXIT);
+        printf("%d. First In First Out\n", FIFO);
+        printf("%d. Second Chance\n", SECONDCHANCE);
+        printf("%d. Least Recently Used\n", LRU);
+        printf("%d. Optimal Page Replacement\n", OPTIMAL);
+        printf("%d. Exit\n", EXIT);
         printf("Choice: ");
         scanf(" %d", &choice);
 
@@ -56,7 +58,14 @@ int main()
         switch (choice)
         {
             case FIFO:
-                firstInFirstOut(frame, frameSize, referenceCopy, referenceAmount);
+                firstInFirstOut(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
+                break;
+            case SECONDCHANCE:
+                secondChance(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
+                break;
+            case LRU:
+                break;
+            case OPTIMAL:
                 break;
             case EXIT:
                 break;
@@ -88,14 +97,120 @@ void cleanFrame(int *frame, int frameSize)
     return ;
 }
 
-void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount)
+void printCurrentFrame(int *frame, int frameSize)
 {
+    printf("Inside Current Frame: ");
+    for (int i = 0; i < frameSize; i++)
+    {
+        printf("%d ", frame[i]);
+    }
+    printf("\n");
+}
+
+void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit)
+{
+    for (int i = 0; i < referenceAmount; i++)
+    {
+        int found = 0;
+        for (int j = 0; j < frameSize; j++)
+        {
+            if (frame[j] == reference[i])
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            pageHit++;
+            printf("Page Hit of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("\n");
+            continue;
+        }
+
+        for (int j = frameSize - 1; j > 0; j--)
+        {
+            frame[j] = frame[j-1];
+        }
+        frame[0] = reference[i];
+
+        pageFault++;
+        printf("Page Fault of reference %d!\n", reference[i]);
+        printCurrentFrame(frame, frameSize);
+        printf("\n");
+    }
+
+    printf("Amount of page fault: %d\n", pageFault);
+    printf("Amount of page hit: %d\n\n", pageHit);
 
     return ;
 }
 
-void secondChance(int *frame, int frameSize, int *reference, int referenceAmount)
+void secondChance(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit)
 {
+    int chance[frameSize];
+    for (int i = 0; i < frameSize; i++)
+    {
+        chance[i] = 0;
+    }
+
+    for (int i = 0; i < referenceAmount; i++)
+    {
+        int found = 0;
+        for (int j = 0; j < frameSize; j++)
+        {
+            if (frame[j] == reference[i])
+            {
+                chance[j] = 1;
+                found = 1;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            pageHit++;
+            printf("Page Hit of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("\n");
+            continue;
+        }
+
+        for (int j = frameSize - 1; j >= 0; j--)
+        {
+            if (chance[j] == 1)
+            {
+                chance[j] = 0;
+                continue;
+            }
+
+            for (int k = j; k >= 0; k--)
+            {
+                if (k == 0)
+                    frame[0] = reference[i];
+                else
+                {
+                    if (chance[k-1] == 1)
+                    {
+                        chance[k-1] = 0;
+                        chance[k] = 1;
+                    }
+                    frame[k] = frame[k-1];
+                }
+            }
+            break;
+        }
+
+        pageFault++;
+        printf("Page Fault of reference %d!\n", reference[i]);
+        printCurrentFrame(frame, frameSize);
+        printf("\n");
+    }
+
+    printf("Amount of page fault: %d\n", pageFault);
+    printf("Amount of page hit: %d\n\n", pageHit);
 
     return ;
 }
