@@ -112,6 +112,23 @@ int abs(int n)
     return n < 0 ? n * -1 : n;
 }
 
+void sortingDevice(int *device, int deviceAmount)
+{
+    for (int i = 0; i < deviceAmount - 1; i++)
+    {
+        int smallest = i;
+        for (int j = i + 1; j < deviceAmount; j++)
+        {
+            if (device[j] < device[smallest])
+                smallest = j;
+        }
+
+        int temp = device[i];
+        device[i] = device[smallest];
+        device[smallest] = temp;
+    }
+}
+
 void printDeviceRequest(int *device, int deviceAmount)
 {
     printf("Device Request:\n");
@@ -188,24 +205,388 @@ void shortestSeekTimeFirst(int *device, int deviceAmount, int headStart)
 
 void scan(int *device, int deviceAmount, int headStart)
 {
+    printDeviceRequest(device, deviceAmount);
+    sortingDevice(device, deviceAmount);
+
+    int choice;
+    while (choice != 1 && choice != 2)
+    {
+        printf("Direction:\n");
+        printf("1. Up\n");
+        printf("2. Down\n");
+        printf("Choice: ");
+        scanf(" %d", &choice);
+        printf("\n");
+
+        if (choice != 1 && choice != 2)
+            printf("Please choose either 1 or 2\n\n");
+    }
+
+    int headIndex = deviceAmount;
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        if (headStart < device[i])
+        {
+            headIndex = i;
+            break;
+        }
+    }
+
+    int finalSeekTime = 0, step = 1;
+    switch (choice)
+    {
+        case 1:
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            printf("Step %d\n", step);
+            printf("Head = %d\n", headStart);
+            printf("Device = 199\n");
+            printf("Head to device difference = %d\n\n", abs(headStart - 199));
+            finalSeekTime += abs(headStart - 199);
+            headStart = 199;
+            step++;
+
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+        case 2:
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            printf("Step %d\n", step);
+            printf("Head = %d\n", headStart);
+            printf("Device = 0\n");
+            printf("Head to device difference = %d\n\n", headStart);
+            finalSeekTime += headStart;
+            headStart = 0;
+            step++;
+
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
 
     return ;
 }
 
 void cScan(int *device, int deviceAmount, int headStart)
 {
+    printDeviceRequest(device, deviceAmount);
+    sortingDevice(device, deviceAmount);
+
+    int choice;
+    while (choice != 1 && choice != 2)
+    {
+        printf("Direction:\n");
+        printf("1. Up\n");
+        printf("2. Down\n");
+        printf("Choice: ");
+        scanf(" %d", &choice);
+        printf("\n");
+
+        if (choice != 1 && choice != 2)
+            printf("Please choose either 1 or 2\n\n");
+    }
+
+    int headIndex = deviceAmount;
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        if (headStart < device[i])
+        {
+            headIndex = i;
+            break;
+        }
+    }
+
+    int finalSeekTime = 0, step = 1;
+    switch (choice)
+    {
+        case 1:
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            printf("Step %d\n", step);
+            printf("Head = %d\n", headStart);
+            printf("Device = 199\n");
+            printf("Head to device difference = %d\n\n", abs(headStart - 199));
+            finalSeekTime += abs(headStart - 199);
+            headStart = 199;
+            step++;
+
+            printf("Step %d\n", step);
+            printf("Head = 199\n");
+            printf("Device = 0\n");
+            printf("Head to device difference = 199\n\n");
+            finalSeekTime += 199;
+            headStart = 0;
+            step++;
+
+            for (int i = 0; i < headIndex; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+        case 2:
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            printf("Step %d\n", step);
+            printf("Head = %d\n", headStart);
+            printf("Device = 0\n");
+            printf("Head to device difference = %d\n\n", headStart);
+            finalSeekTime += headStart;
+            headStart = 0;
+            step++;
+
+            printf("Step %d\n", step);
+            printf("Head = 0\n");
+            printf("Device = 199\n");
+            printf("Head to device difference = 199\n\n");
+            finalSeekTime += 199;
+            headStart = 199;
+            step++;
+
+            for (int i = deviceAmount - 1; i >= deviceAmount; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
 
     return ;
 }
 
 void look(int *device, int deviceAmount, int headStart)
 {
+    printDeviceRequest(device, deviceAmount);
+    sortingDevice(device, deviceAmount);
+
+    int choice;
+    while (choice != 1 && choice != 2)
+    {
+        printf("Direction:\n");
+        printf("1. Up\n");
+        printf("2. Down\n");
+        printf("Choice: ");
+        scanf(" %d", &choice);
+        printf("\n");
+
+        if (choice != 1 && choice != 2)
+            printf("Please choose either 1 or 2\n\n");
+    }
+
+    int headIndex = deviceAmount;
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        if (headStart < device[i])
+        {
+            headIndex = i;
+            break;
+        }
+    }
+
+    int finalSeekTime = 0, step = 1;
+    switch (choice)
+    {
+        case 1:
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+        case 2:
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
 
     return ;
 }
 
 void cLook(int *device, int deviceAmount, int headStart)
 {
+    printDeviceRequest(device, deviceAmount);
+    sortingDevice(device, deviceAmount);
+
+    int choice;
+    while (choice != 1 && choice != 2)
+    {
+        printf("Direction:\n");
+        printf("1. Up\n");
+        printf("2. Down\n");
+        printf("Choice: ");
+        scanf(" %d", &choice);
+        printf("\n");
+
+        if (choice != 1 && choice != 2)
+            printf("Please choose either 1 or 2\n\n");
+    }
+
+    int headIndex = deviceAmount;
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        if (headStart < device[i])
+        {
+            headIndex = i;
+            break;
+        }
+    }
+
+    int finalSeekTime = 0, step = 1;
+    switch (choice)
+    {
+        case 1:
+            for (int i = headIndex; i < deviceAmount; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            for (int i = 0; i < headIndex; i++, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+        case 2:
+            for (int i = headIndex - 1; i >= 0; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+
+            for (int i = deviceAmount - 1; i >= headIndex; i--, step++)
+            {
+                int difference = abs(headStart - device[i]);
+                printf("Step %d\n", step);
+                printf("Head = %d\n", headStart);
+                printf("Device = %d\n", device[i]);
+                printf("Head to device difference = %d\n\n", difference);
+                finalSeekTime += difference;
+                headStart = device[i];
+            }
+            break;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
 
     return ;
 }
