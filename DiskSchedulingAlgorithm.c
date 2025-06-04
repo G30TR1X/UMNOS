@@ -12,16 +12,27 @@ enum algorithm {
 };
 
 void copyArray(int *originalArray, int *newArray, int size);
-void firstComeFirstServe(int *device, int deviceAmount);
-void scan(int *device, int deviceAmount);
-void cScan(int *device, int deviceAmount);
-void cScan(int *device, int deviceAmount);
-void look(int *device, int deviceAmount);
-void cLook(int *device, int deviceAmount);
+void firstComeFirstServe(int *device, int deviceAmount, int headStart);
+void shortestSeekTimeFirst(int *device, int deviceAmount, int headStart);
+void scan(int *device, int deviceAmount, int headStart);
+void cScan(int *device, int deviceAmount, int headStart);
+void cScan(int *device, int deviceAmount, int headStart);
+void look(int *device, int deviceAmount, int headStart);
+void cLook(int *device, int deviceAmount, int headStart);
 
 int main()
 {
+    int headStart;
     int deviceAmount;
+    printf("Head Start: ");
+    scanf(" %d", &headStart);
+
+    while (headStart > 199 || headStart < 0)
+    {
+        printf("Please input a head start from 0 - 199: ");
+        scanf(" %d", &headStart);
+    }
+
     printf("Amount of Devices: ");
     scanf(" %d", &deviceAmount);
     printf("\n");
@@ -44,7 +55,7 @@ int main()
     {
         printf("Pick your Disk Scheduling Algorithm!\n");
         printf("%d. First Come First Serve\n", FCFS);
-        printf("%d. Shortest Seek Time\n", SSTF);
+        printf("%d. Shortest Seek Time First\n", SSTF);
         printf("%d. SCAN\n", SCAN);
         printf("%d. C-SCAN\n", CSCAN);
         printf("%d. LOOK\n", LOOK);
@@ -52,25 +63,29 @@ int main()
         printf("%d. Exit\n", EXIT);
         printf("Choice: ");
         scanf(" %d", &choice);
+        printf("\n");
 
         copyArray(device, deviceCopy, deviceAmount);
 
         switch (choice)
         {
             case FCFS:
-                firstComeFirstServe(device, deviceAmount);
+                firstComeFirstServe(deviceCopy, deviceAmount, headStart);
+                break;
+            case SSTF:
+                shortestSeekTimeFirst(deviceCopy, deviceAmount, headStart);
                 break;
             case SCAN:
-                scan(device, deviceAmount);
+                scan(deviceCopy, deviceAmount, headStart);
                 break;
             case CSCAN:
-                cScan(device, deviceAmount);
+                cScan(deviceCopy, deviceAmount, headStart);
                 break;
             case LOOK:
-                look(device, deviceAmount);
+                look(deviceCopy, deviceAmount, headStart);
                 break;
             case CLOOK:
-                cLook(device, deviceAmount);
+                cLook(deviceCopy, deviceAmount, headStart);
                 break;
             case EXIT:
                 break;
@@ -92,31 +107,104 @@ void copyArray(int *originalArray, int *newArray, int size)
     return ;
 }
 
-void firstComeFirstServe(int *device, int deviceAmount)
+int abs(int n)
+{
+    return n < 0 ? n * -1 : n;
+}
+
+void printDeviceRequest(int *device, int deviceAmount)
+{
+    printf("Device Request:\n");
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        printf("%d ", device[i]);
+    }
+    printf("\n\n");
+}
+
+void firstComeFirstServe(int *device, int deviceAmount, int headStart)
+{
+    printDeviceRequest(device, deviceAmount);
+
+    int finalSeekTime = 0, step = 1;
+    for (int i = 0; i < deviceAmount; i++, step++)
+    {
+        int difference = abs(headStart - device[i]);
+        printf("Step %d\n", step);
+        printf("Head = %d\n", headStart);
+        printf("Device = %d\n", device[i]);
+        printf("Head to device difference = %d\n\n", difference);
+        finalSeekTime += difference;
+        headStart = device[i];
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
+
+    return ;
+}
+
+void shortestSeekTimeFirst(int *device, int deviceAmount, int headStart)
+{
+    printDeviceRequest(device, deviceAmount);
+
+    int finalSeekTime = 0, step = 1;
+    int used[deviceAmount];
+
+    for (int i = 0; i < deviceAmount; i++)
+    {
+        used[i] = 0;
+    }
+
+    for (int i = 0; i < deviceAmount; i++, step++)
+    {
+        int shortestSeekTime = INT_MAX;
+        int shortestSeekTimeIndex = i;
+        for (int j = 0; j < deviceAmount; j++)
+        {
+            if (used[j])
+                continue;
+
+            int difference = abs(headStart - device[j]);
+            if (difference < shortestSeekTime)
+            {
+                shortestSeekTime = difference;
+                shortestSeekTimeIndex = j;
+            }
+        }
+
+        printf("Step %d\n", step);
+        printf("Head = %d\n", headStart);
+        printf("Device = %d\n", device[shortestSeekTimeIndex]);
+        printf("Head to device difference = %d\n\n", shortestSeekTime);
+        finalSeekTime += shortestSeekTime;
+        headStart = device[shortestSeekTimeIndex];
+        used[shortestSeekTimeIndex] = 1;
+    }
+
+    printf("Final Seek Time = %d\n\n", finalSeekTime);
+
+    return ;
+}
+
+void scan(int *device, int deviceAmount, int headStart)
 {
 
     return ;
 }
 
-void scan(int *device, int deviceAmount)
+void cScan(int *device, int deviceAmount, int headStart)
 {
 
     return ;
 }
 
-void cScan(int *device, int deviceAmount)
+void look(int *device, int deviceAmount, int headStart)
 {
 
     return ;
 }
 
-void look(int *device, int deviceAmount)
-{
-
-    return ;
-}
-
-void cLook(int *device, int deviceAmount)
+void cLook(int *device, int deviceAmount, int headStart)
 {
 
     return ;
