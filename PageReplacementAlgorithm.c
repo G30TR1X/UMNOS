@@ -5,6 +5,7 @@ enum algorithm {
     FIFO = 1,
     SECONDCHANCE,
     LRU,
+    LFU,
     OPTIMAL,
     EXIT,
 };
@@ -14,6 +15,7 @@ void cleanFrame(int *frame, int frameSize);
 void firstInFirstOut(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void secondChance(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
+void leastFrequentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 void optimalPageReplacement(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit);
 
 int main()
@@ -46,6 +48,7 @@ int main()
         printf("%d. First In First Out\n", FIFO);
         printf("%d. Second Chance\n", SECONDCHANCE);
         printf("%d. Least Recently Used\n", LRU);
+        printf("%d. Least Frequently Used\n", LFU);
         printf("%d. Optimal Page Replacement\n", OPTIMAL);
         printf("%d. Exit\n", EXIT);
         printf("Choice: ");
@@ -64,6 +67,9 @@ int main()
                 break;
             case LRU:
                 leastRecentlyUsed(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
+                break;
+            case LFU:
+                leastFrequentlyUsed(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
                 break;
             case OPTIMAL:
                 optimalPageReplacement(frame, frameSize, referenceCopy, referenceAmount, pageFault, pageHit);
@@ -253,6 +259,84 @@ void leastRecentlyUsed(int *frame, int frameSize, int *reference, int referenceA
             frame[j] = frame[j-1];
         }
         frame[0] = reference[i];
+
+        pageFault++;
+        printf("Page Fault of reference %d!\n", reference[i]);
+        printCurrentFrame(frame, frameSize);
+        printf("\n");
+    }
+
+    printf("Amount of page fault: %d\n", pageFault);
+    printf("Amount of page hit: %d\n\n", pageHit);
+
+    return ;
+}
+
+void leastFrequentlyUsed(int *frame, int frameSize, int *reference, int referenceAmount, int pageFault, int pageHit)
+{
+    int frequency[frameSize];
+    for (int i = 0; i < frameSize; i++) // freq arr
+    {
+        frequency[i] = 0;
+    }
+    
+    for (int i = 0; i < referenceAmount; i++)
+    {
+        int found = 0;
+        for (int j = 0; j < frameSize; j++) // iterate to check if page is already in frame
+        {
+            if (frame[j] == reference[i])
+            {
+                frequency[j]++;
+                found = 1;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            pageHit++;
+            printf("Page Hit of reference %d!\n", reference[i]);
+            printCurrentFrame(frame, frameSize);
+            printf("Frequency: ");
+            for (int j = 0; j < frameSize; j++)
+            {
+                printf("%d ", frequency[j]);
+            }
+            printf("\n");
+            continue;
+        }
+
+        // not found, find the page that are least frequently used
+        int minFreq = INT_MAX;
+        int replaceIndex = 0;
+        int hasEmptySlot = 0;
+        
+        for (int j = 0; j < frameSize; j++)
+        {
+            if (frame[j] == INT_MIN) // Empty slot
+            {
+                replaceIndex = j;
+                hasEmptySlot = 1;
+                break;
+            }
+        }
+        
+        // no empty slot, find the least frequently used page
+        if (!hasEmptySlot)
+        {
+            for (int j = 0; j < frameSize; j++)
+            {
+                if (frequency[j] < minFreq)
+                {
+                    minFreq = frequency[j];
+                    replaceIndex = j;
+                }
+            }
+        }
+
+        frame[replaceIndex] = reference[i];
+        frequency[replaceIndex] = 1;
 
         pageFault++;
         printf("Page Fault of reference %d!\n", reference[i]);
