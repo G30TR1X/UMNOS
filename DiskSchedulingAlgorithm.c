@@ -403,7 +403,7 @@ void cScan(int *device, int deviceAmount, int headStart)
             headStart = 199;
             step++;
 
-            for (int i = deviceAmount - 1; i >= deviceAmount; i--, step++)
+            for (int i = deviceAmount - 1; i >= headIndex; i--, step++)
             {
                 int difference = abs(headStart - device[i]);
                 printf("Step %d\n", step);
