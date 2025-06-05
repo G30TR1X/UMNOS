@@ -303,7 +303,7 @@ void leastFrequentlyUsed(int *frame, int frameSize, int *reference, int referenc
             {
                 printf("%d ", frequency[j]);
             }
-            printf("\n");
+            printf("\n\n");
             continue;
         }
 
